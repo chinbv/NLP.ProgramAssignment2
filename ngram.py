@@ -6,9 +6,11 @@ contents = f.read()
 f.close()
 # print contents
 
-
+frequencydict = {}
+counts = dict()
 
 def generate_ngrams(s,n):
+
     # Convert to lowercases
     s = s.lower()
 
@@ -25,7 +27,13 @@ def generate_ngrams(s,n):
     # Break sentence into the tokens, remove empty tokens
     tokens = [token for token in s.split(" ") if token != ""]
 
-    count=0
+    count = 0
+
+    for i in tokens:
+        if i in counts:
+            counts[i] +=1
+        else:
+            counts[i] = 1
 
     print 'Tokens are = ' + str(tokens)
 
@@ -37,8 +45,10 @@ def generate_ngrams(s,n):
 
     # Use the zip function to help us generate n-grams
     # Concatentate the tokens into ngrams and return
-    ngrams = zip(*[tokens[i:] for i in range(n)])
-    return [" ".join(ngram) for ngram in ngrams]
+    # ngrams = zip(*[tokens[i:] for i in range(n)])
+    # return [" ".join(ngram) for ngram in ngrams]
+
+    return counts
 
     #Build the dictionary with tokens as keys and frequency as values
 
