@@ -8,6 +8,7 @@ f.close()
 # print contents
 
 ngramDict = {}
+unigramDict = {}
 # tokenDict = {}
 
 # counts = dict()
@@ -59,6 +60,15 @@ def generate_ngrams(s,n):
         count+=1
         # print 'Token Count = ' + str(count)
     print 'Token Count = ' + str(count)
+
+    for i in tokens:
+        if i in unigramDict:
+            unigramDict[i] +=1
+        else:
+            unigramDict[i] = 1
+    for key,value in unigramDict.items():
+        print str(key) + " => " + str(value)
+
 
 
     # Use the zip function to help us generate n-grams
