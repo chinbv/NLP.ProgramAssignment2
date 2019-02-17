@@ -1,13 +1,16 @@
 import re
 import sys
+import collections
 
 f = open(sys.argv[1],"r")
 contents = f.read()
 f.close()
 # print contents
 
-frequencydict = {}
-counts = dict()
+ngramDict = {}
+# tokenDict = {}
+
+# counts = dict()
 
 def generate_ngrams(s,n):
 
@@ -29,18 +32,33 @@ def generate_ngrams(s,n):
 
     count = 0
 
-    for i in tokens:
-        if i in counts:
-            counts[i] +=1
-        else:
-            counts[i] = 1
+    for currToken in tokens:
 
-    print 'Tokens are = ' + str(tokens)
+        if currToken in ngramDict:
+            tokenDict = ngramDict[currToken]
+            if tokenDict is not None:
+                if '<frequency>' in tokenDict:
+                    tokenDict['<frequency>'] += 1
+                else:
+                    tokenDict['<frequency>'] = 1
+            else:
+                tokenDict = { '<frequency>': 1 }
+                ngramDict[currToken] = tokenDict
+        else:
+            tokenDict = { '<frequency>': 1 }
+            ngramDict[currToken] = tokenDict
+
+        # print frequencyDict.keys()
+        print ngramDict.values()
+
+    # print tokenDict
+
+    # print 'Tokens are = ' + str(tokens)
 
     for x in tokens:
         count+=1
-        print 'Token Count = ' + str(count)
-
+        # print 'Token Count = ' + str(count)
+    print 'Token Count = ' + str(count)
 
 
     # Use the zip function to help us generate n-grams
@@ -48,7 +66,7 @@ def generate_ngrams(s,n):
     # ngrams = zip(*[tokens[i:] for i in range(n)])
     # return [" ".join(ngram) for ngram in ngrams]
 
-    return counts
+    return ngramDict
 
     #Build the dictionary with tokens as keys and frequency as values
 
