@@ -15,6 +15,9 @@ unigramDict = {}
 
 def generate_ngrams(s,n):
 
+    lookBackBuffer = []
+
+
     # Convert to lowercases
     s = s.lower()
 
@@ -32,11 +35,17 @@ def generate_ngrams(s,n):
     tokens = [token for token in s.split(" ") if token != ""]
 
     count = 0
+    ngramSize = 3
 
     for currToken in tokens:
 
-        if currToken in ngramDict:
-            tokenDict = ngramDict[currToken]
+
+        if len(lookBackBuffer) < ngramSize:
+            lookBackBuffer.append(str(currToken))
+        newNgram = " ".join(lookBackBuffer)
+        print "new ngram = " + str(newNgram)
+        if newNgram in ngramDict:
+            tokenDict = ngramDict[newNgram]
             if tokenDict is not None:
                 if '<frequency>' in tokenDict:
                     tokenDict['<frequency>'] += 1
@@ -44,13 +53,31 @@ def generate_ngrams(s,n):
                     tokenDict['<frequency>'] = 1
             else:
                 tokenDict = { '<frequency>': 1 }
-                ngramDict[currToken] = tokenDict
+                ngramDict[newNgram] = tokenDict
         else:
             tokenDict = { '<frequency>': 1 }
-            ngramDict[currToken] = tokenDict
+            ngramDict[newNgram] = tokenDict
+        print ("Contents of buffer " + str(lookBackBuffer))
+        if len(lookBackBuffer) == ngramSize:
+            del lookBackBuffer[0]
+            print ("Contents of buffer " + str(lookBackBuffer))
+
+        # if currToken in ngramDict:
+        #     tokenDict = ngramDict[currToken]
+        #     if tokenDict is not None:
+        #         if '<frequency>' in tokenDict:
+        #             tokenDict['<frequency>'] += 1
+        #         else:
+        #             tokenDict['<frequency>'] = 1
+        #     else:
+        #         tokenDict = { '<frequency>': 1 }
+        #         ngramDict[currToken] = tokenDict
+        # else:
+        #     tokenDict = { '<frequency>': 1 }
+        #     ngramDict[currToken] = tokenDict
 
         # print frequencyDict.keys()
-        print ngramDict.values()
+        # print ngramDict.values()
 
     # print tokenDict
 
@@ -59,15 +86,16 @@ def generate_ngrams(s,n):
     for x in tokens:
         count+=1
         # print 'Token Count = ' + str(count)
-    print 'Token Count = ' + str(count)
+    # print 'Token Count = ' + str(count)
 
-    for i in tokens:
-        if i in unigramDict:
-            unigramDict[i] +=1
+    for token in tokens:
+        if token in unigramDict:
+            unigramDict[token] +=1
         else:
-            unigramDict[i] = 1
-    for key,value in unigramDict.items():
-        print str(key) + " => " + str(value)
+            unigramDict[token] = 1
+    # for key,value in unigramDict.items():
+        # print str(key) + " => " + str(value)
+
 
 
 
