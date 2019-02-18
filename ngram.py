@@ -47,9 +47,9 @@ def generate_ngrams(s,n):
     for currToken in tokens:
         newNgram =''
 
-        print "------------\nProcessing token " + currToken
-        #
-        print "lookBackBuffer " + str(lookBackBuffer)
+        # print "------------\nProcessing token " + currToken
+
+        # print "lookBackBuffer " + str(lookBackBuffer)
 
         #Adding the <start> tag to beginning of sentences
         if (startBoolean == True):
@@ -62,12 +62,12 @@ def generate_ngrams(s,n):
             currToken = '<end>'
 
         if previousNgramDict is not None:
-            print "previus ngram dict exists, adding token " + currToken
+            # print "previus ngram dict exists, adding token " + currToken
             if currToken in previousNgramDict:
-                print "previus token exists, count was " + previousNgramDict[currToken]
+                # print "previus token exists, count was " + previousNgramDict[currToken]
                 previousNgramDict[currToken] += 1
             else:
-                print "previus token did not exist, creating one"
+                # print "previus token did not exist, creating one"
                 previousNgramDict[currToken] = 1
 
         lookBackBuffer.append(str(currToken))
@@ -77,23 +77,23 @@ def generate_ngrams(s,n):
 
             #Removing the first element of the lookBackBuffer if the buffer is size of desired ngram
             if len(lookBackBuffer) == ngramSize:
-                print ("Buffer before deletion " + str(lookBackBuffer) + " len(lookBackBuffer): " + str(len(lookBackBuffer))
-                    + " ngramSize: " + str(ngramSize))
+                # print ("Buffer before deletion " + str(lookBackBuffer) + " len(lookBackBuffer): " + str(len(lookBackBuffer))
+                #     + " ngramSize: " + str(ngramSize))
                 del lookBackBuffer[0]
-                print ("Buffer after removal of first element " + " len(lookBackBuffer): " + str(len(lookBackBuffer))
-                    + " ngramSize: " + str(ngramSize))
+                # print ("Buffer after removal of first element " + " len(lookBackBuffer): " + str(len(lookBackBuffer))
+                #     + " ngramSize: " + str(ngramSize))
 
             #Creates the new ngram from the full look back buffer
             newNgram = " ".join(lookBackBuffer)
 
-            print ("Joined newNgram = " + newNgram + " len(lookBackBuffer): " + str(len(lookBackBuffer)) + " ngramSize: " + str(ngramSize))
-
-            print "new ngram after join= " + str(newNgram)
+            # print ("Joined newNgram = " + newNgram + " len(lookBackBuffer): " + str(len(lookBackBuffer)) + " ngramSize: " + str(ngramSize))
+            #
+            # print "new ngram after join= " + str(newNgram)
 
             #adding the new ngram to the dictionary and getting frequencies for it)
 
             if newNgram in ngramDict:
-                print "incrementing ngram " + newNgram + " count"
+                # print "incrementing ngram " + newNgram + " count"
                 tokenDict = ngramDict[newNgram]
                 if tokenDict is not None:
                     if '<frequency>' in tokenDict:
@@ -104,11 +104,11 @@ def generate_ngrams(s,n):
                     tokenDict = { '<frequency>': 1 }
                     ngramDict[newNgram] = tokenDict
             else:
-                print "adding ngram " + "|" + newNgram + "|" + " to ngramDict"
+                # print "adding ngram " + "|" + newNgram + "|" + " to ngramDict"
                 tokenDict = { '<frequency>': 1 }
                 ngramDict[newNgram] = tokenDict
-                print ("Buffer after newNgram is added to ngramDict " + " len(lookBackBuffer): " + str(len(lookBackBuffer))
-                    + " ngramSize: " + str(ngramSize))
+                # print ("Buffer after newNgram is added to ngramDict " + " len(lookBackBuffer): " + str(len(lookBackBuffer))
+                #     + " ngramSize: " + str(ngramSize))
 
             #Save tokenDict for use with the next token
             previousNgramDict = ngramDict[newNgram]
@@ -116,7 +116,7 @@ def generate_ngrams(s,n):
 
         #if the current token is <end> clear the lookBackBuffer and make the next token the <start> tag
         if (currToken == '<end>'):
-            print "currToken is an end"
+            # print "currToken is an end"
             lookBackBuffer = [] #resetting lookBackBuffer
             previousNgramDict = None #resetting previousNgramDict
             startBoolean = True #insert <start> tag
@@ -125,39 +125,29 @@ def generate_ngrams(s,n):
     ngramFreqCount = 0
 
     for ngram, ngramValueDict in ngramDict.items():
-        print "ngram key: " + ngram
+        # print "ngram key: " + ngram
         frequencyCount = ngramValueDict["<frequency>"]
-        print "frequency count: " + str(frequencyCount)
+        # print "frequency count: " + str(frequencyCount)
         ngramFreqCount += frequencyCount
-        print "ngramFreqCount count: " + str(ngramFreqCount) + " frequencyCount: " + str(frequencyCount)
+        # print "ngramFreqCount count: " + str(ngramFreqCount) + " frequencyCount: " + str(frequencyCount)
     print "ngramFreqCount count: " + str(ngramFreqCount)
 
     for x in tokens:
         count+=1
-        print 'Token Count = ' + str(count)
+        # print 'Token Count = ' + str(count)
     print 'Token Count = ' + str(count)
 
 
-    
-
-    for token in tokens:
-        if token in unigramDict:
-            unigramDict[token] +=1
-        else:
-            unigramDict[token] = 1
-    for key,value in unigramDict.items():
-        # print str("value is = " + str(value) + " count is = " + str(count))
-        value = Decimal(value)
-        count = Decimal(count)
-        probability = Decimal(value/count)
-        # print str("probability is = " + str(probability))
-        roundedProbability = round(probability,4)
-        # print str("probability is = " + str(roundedProbability))
-
-        unigramDict[key] = probability
-
-        # print str("probability is = " + str(roundedProbability))
-        # print str(key) + " => " + str(unigramDict[key])
+    for ngram, tokenDict in ngramDict.items():
+        denominator = Decimal(tokenDict['<frequency>'])
+        # print 'denominator is ' + str(denominator)
+        for followingToken, tokenCount in tokenDict.items():
+            if followingToken is not '<frequency>':
+                # print 'tokenCount is ' + str(tokenCount)
+                probability = Decimal(tokenCount/denominator)
+                # print 'probability is = ' + str(probability)
+                tokenDict[followingToken] = probability
+                print str(tokenDict[followingToken])
 
 
 
