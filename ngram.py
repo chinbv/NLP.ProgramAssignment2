@@ -22,12 +22,12 @@ def main():
         contents = f.read()
         f.close()
 
-    for i in range(int(numberOfSentences)):
         generate_ngrams(contents, n, ngramDict)
         generate_probabilities(ngramDict)
-        index = i + 1
-        print ("Sentence number #" + str(index) + ": ")
-        print (generate_sentences(ngramDict))
+        for i in range(int(numberOfSentences)):
+            index = i + 1
+            print ("Sentence number #" + str(index) + ": ")
+            print (generate_sentences(ngramDict))
 
     # print (generate_sentences(ngramDict))
 
