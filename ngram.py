@@ -4,20 +4,29 @@ import collections
 from decimal import Decimal
 from random import *
 
-f = open(sys.argv[1],"r")
-contents = f.read()
-f.close()
-# print contents
-
 ngramDict = {}
 
-# counts = dict()
+def main():
 
-def generate_ngrams(s,n):
+    # f = open(sys.argv[1],"r")
+    # contents = f.read()
+    # f.close()
+
+    for arg in sys.argv[3:]:
+        f = open(sys.argv[3:],"r")
+        contents = f.read()
+        f.close()
+
+    generate_ngrams(contents, ngramDict)
+    generate_probabilities(ngramDict)
+    generate_sentences(ngramDict)
+
+    # print (generate_sentences(ngramDict))
 
 
+    # counts = dict()
 
-
+def generate_ngrams(s, ngramDict):
     # Convert to lowercases
     s = s.lower()
 
@@ -38,7 +47,7 @@ def generate_ngrams(s,n):
 
     ngramCount = 0
     count = 0
-    ngramSize = n
+    ngramSize = 3
     previousNgramDict = None
     lookBackBuffer = []
     ngramBuffer = [] * ngramSize
@@ -124,8 +133,8 @@ def generate_ngrams(s,n):
             previousNgramDict = None #resetting previousNgramDict
             startBoolean = True #insert <start> tag
 
-    # END FOR LOOP
 
+def generate_probabilities(ngramDict):
     ngramFreqCount = 0
 
 
@@ -137,8 +146,8 @@ def generate_ngrams(s,n):
         # print "ngramFreqCount count: " + str(ngramFreqCount) + " frequencyCount: " + str(frequencyCount)
     # print "ngramFreqCount count: " + str(ngramFreqCount)
 
-    for x in tokens:
-        count+=1
+    # for x in tokens:
+    #     count+=1
         # print 'Token Count = ' + str(count)
 
     #print 'Token Count = ' + str(count)
@@ -161,6 +170,7 @@ def generate_ngrams(s,n):
 
     # generate sentences
 
+def generate_sentences(ngramDict):
     sentenceString =''
     sumOfProbabilities = 0
     chosenToken = None
@@ -180,12 +190,12 @@ def generate_ngrams(s,n):
 
 
     sentenceString += ngram
-    # print ("sentence now: ") + sentenceString;
+    print ("sentence now: ") + sentenceString;
 
     randomNumber = random()
-    #print "random number is " + str(randomNumber)
+    print "random number is: " + str(randomNumber)
     while sentenceEnd is False:
-        #print "fetching tokenDict for ngram " + ngram
+        print "fetching tokenDict for ngram: " + ngram
         tokenDict = ngramDict[ngram]
 
         # selecting amongst this ngrams's follow on words
@@ -194,20 +204,23 @@ def generate_ngrams(s,n):
 
         for followingToken, tokenProbability in tokenDict.items():
             if followingToken is not '<frequency>':
-                #print "followingToken is " + followingToken
+                print "followingToken is: " + followingToken
                 sumOfProbabilities += Decimal(tokenProbability)
+
+                print "sum of probabilities now " + str(sumOfProbabilities)
 
                 if sumOfProbabilities < randomNumber:
                     # selection not yet reached
-                    #print "setting previousWord to " + followingToken
+                    print "setting previousWord to: " + followingToken
                     previousWord = followingToken
                 else:
                     # selection should be the previously token unless there isn't one
                     if previousWord is None:
-                        #print "there was no previous word, so using the the current one " + followingToken
+                        print "there was no previous word, choosing token: " + followingToken
                         chosenToken = followingToken
+                        break
                     else:
-                        #print "setting chosen token to previous word " + previousWord
+                        print "setting chosen token to previous word: " + previousWord
                         chosenToken = previousWord
 
         if chosenToken is None:
@@ -215,7 +228,11 @@ def generate_ngrams(s,n):
             print "did not choose one, previous word was " + previousWord + " and token Dict is " + str(tokenDict)
             raise("internal error")
 
-        #print "out of iterating through tokenDict items, chosenToken is " + chosenToken
+        if chosenToken is '<frequency>':
+            print "chosen token can never be frequency"
+            raise("internal error")
+
+        print "out of iterating through tokenDict items, chosenToken is " + chosenToken
 
         # if previousWord == None:
         #     if followingToken is not '<frequency>':
@@ -233,19 +250,13 @@ def generate_ngrams(s,n):
             del ngramWordList[0]
 
             ngram = ' '.join(ngramWordList)
-        # print "new ngram is " + ngram
+            print "new ngram is " + ngram
         else:
             sentenceEnd = True
 
-
-        # print "sentenceString now " + sentenceString
-
-
+        print sentenceString
 
     return sentenceString
 
-# contents = "my, oh my, i wish i had 100 dollars." \
-
-#for i in range(0, 10):
-
-print (generate_ngrams(contents, n=4))
+if __name__ == "__main__":
+    main()
