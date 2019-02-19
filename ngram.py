@@ -22,12 +22,17 @@ def main():
         contents = f.read()
         f.close()
 
+        numberOfArgs = len(sys.argv)
+
+    for i in range(int(numberOfArgs)):
         generate_ngrams(contents, n, ngramDict)
-        generate_probabilities(ngramDict)
-        for i in range(int(numberOfSentences)):
-            index = i + 1
-            print ("Sentence number #" + str(index) + ": ")
-            print (generate_sentences(ngramDict))
+
+    generate_probabilities(ngramDict)
+
+    for i in range(int(numberOfSentences)):
+        index = i + 1
+        print ("Sentence number #" + str(index) + ": ")
+        print (generate_sentences(ngramDict))
 
     # print (generate_sentences(ngramDict))
 
@@ -169,10 +174,10 @@ def generate_probabilities(ngramDict):
             if followingToken is not '<frequency>':
                 #print 'tokenCount is ' + str(tokenCount)
                 probability = Decimal(tokenCount/denominator)
-                #print 'probability is = ' + str(probability)
+                # print 'probability is = ' + str(probability)
                 tokenDict[followingToken] = probability
                 #print str(tokenDict[followingToken])
-        #print "generated probabilities for ngram " + ngram + " token dict is " + str(tokenDict)
+        # print "generated probabilities for ngram " + ngram + " token dict is " + str(tokenDict)
 
 
 
@@ -194,17 +199,23 @@ def generate_sentences(ngramDict):
             currentNGram = ngram
             break
 
+    # print ("sentence now: ") + sentenceString;
 
-    sentenceString += ngramWordList[1]
+    ngramWordListCount = len(ngramWordList)
+    for ngramToken in ngramWordList:
+        if ngramToken != '<start>':
+            if len(sentenceString) != 0:
+                sentenceString += " "
+            sentenceString += ngramToken
 
-    print ("sentence now: ") + sentenceString;
+    # print ("sentence now: ") + sentenceString;
 
     randomNumber = random()
-    print "random number is: " + str(randomNumber)
+    #print "random number is: " + str(randomNumber)
     while sentenceEnd is False:
-        print "fetching tokenDict for ngram: " + ngram
+        #print "fetching tokenDict for ngram: " + ngram
         tokenDict = ngramDict[ngram]
-        print "tokenDict is: " + str(tokenDict)
+        #print "tokenDict is: " + str(tokenDict)
 
         # selecting amongst this ngrams's follow on words
         sumOfProbabilities = 0
@@ -216,43 +227,50 @@ def generate_sentences(ngramDict):
         tokenIndex = 0
 
         while chosenToken is None:
-            if tokenIndex == tokenCount:
+            # make sure tokenIndex
+            if tokenIndex >= tokenCount:
                 raise("tokenIndex exceeded range error")
 
             followingToken = tokenKeys[tokenIndex]
 
             if followingToken != '<frequency>':
                 tokenProbability = tokenDict[followingToken]
-                print "followingToken is: " + followingToken + " probability is : " + str(tokenProbability)
+                # print "followingToken is: " + followingToken + " probability is : " + str(tokenProbability)
                 sumOfProbabilities += Decimal(tokenProbability)
 
-                print "sum of probabilities now " + str(sumOfProbabilities)
+                # print "sum of probabilities now " + str(sumOfProbabilities)
 
                 if sumOfProbabilities < randomNumber:
                     # selection not yet reached
-                    print "setting previousWord to: " + followingToken
+                    # print "setting previousWord to: " + followingToken
                     previousWord = followingToken
                 else:
                     # selection should be the previously token unless there isn't one
                     if previousWord is None:
-                        print "there was no previous word, choosing token: " + followingToken
+                        # print "there was no previous word, choosing token: " + followingToken
                         chosenToken = followingToken
                         break
                     else:
-                        print "setting chosen token to previous word: " + previousWord
+                        #print "setting chosen token to previous word: " + previousWord
                         chosenToken = previousWord
             tokenIndex += 1
 
+            # if the tokenIndex is now out of range, then choose the last token encountered
+            if tokenIndex >= tokenCount:
+                # out of other possibilities
+                if previousWord is not None:
+                    chosenToken = previousWord
+
         if chosenToken is None:
             # didn't choose one
-            print "did not choose one, previous word was " + previousWord + " and token Dict is " + str(tokenDict)
+            # print "did not choose one, previous word was " + previousWord + " and token Dict is " + str(tokenDict)
             raise("internal error")
 
         if chosenToken is '<frequency>':
-            print "chosen token can never be frequency"
+            # print "chosen token can never be frequency"
             raise("internal error")
 
-        print "out of iterating through tokenDict items, chosenToken is " + chosenToken
+        #print "out of iterating through tokenDict items, chosenToken is " + chosenToken
 
         # if previousWord == None:
         #     if followingToken is not '<frequency>':
@@ -270,11 +288,11 @@ def generate_sentences(ngramDict):
             del ngramWordList[0]
 
             ngram = ' '.join(ngramWordList)
-            print "new ngram is " + ngram
+            # print "new ngram is " + ngram
         else:
             sentenceEnd = True
 
-        print "sentence currently: " + sentenceString
+        # print "sentence currently: " + sentenceString
 
     return sentenceString
 
