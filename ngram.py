@@ -2,6 +2,7 @@ import re
 import sys
 import collections
 from decimal import Decimal
+from random import *
 
 f = open(sys.argv[1],"r")
 contents = f.read()
@@ -9,13 +10,12 @@ f.close()
 # print contents
 
 ngramDict = {}
-unigramDict = {}
 
 # counts = dict()
 
 def generate_ngrams(s,n):
 
-    lookBackBuffer = []
+
 
 
     # Convert to lowercases
@@ -38,12 +38,15 @@ def generate_ngrams(s,n):
 
     ngramCount = 0
     count = 0
-    ngramSize = 3
+    ngramSize = n
     previousNgramDict = None
+    lookBackBuffer = []
+    ngramBuffer = [] * ngramSize
 
     startBoolean = True #initially true for the very first <start> tag
 
     #the current token you are on of all the tokens
+    #
     for currToken in tokens:
         newNgram =''
 
@@ -121,8 +124,10 @@ def generate_ngrams(s,n):
             previousNgramDict = None #resetting previousNgramDict
             startBoolean = True #insert <start> tag
 
+    # END FOR LOOP
 
     ngramFreqCount = 0
+
 
     for ngram, ngramValueDict in ngramDict.items():
         # print "ngram key: " + ngram
@@ -130,12 +135,12 @@ def generate_ngrams(s,n):
         # print "frequency count: " + str(frequencyCount)
         ngramFreqCount += frequencyCount
         # print "ngramFreqCount count: " + str(ngramFreqCount) + " frequencyCount: " + str(frequencyCount)
-    print "ngramFreqCount count: " + str(ngramFreqCount)
+    # print "ngramFreqCount count: " + str(ngramFreqCount)
 
     for x in tokens:
         count+=1
         # print 'Token Count = ' + str(count)
-    print 'Token Count = ' + str(count)
+    # print 'Token Count = ' + str(count)
 
 
     for ngram, tokenDict in ngramDict.items():
@@ -147,25 +152,67 @@ def generate_ngrams(s,n):
                 probability = Decimal(tokenCount/denominator)
                 # print 'probability is = ' + str(probability)
                 tokenDict[followingToken] = probability
-                print str(tokenDict[followingToken])
+                # print str(tokenDict[followingToken])
+
+    sentenceString =''
+    sumOfProbabilities = 0
+    previousWord = None
+    chosenToken = None
+    sentenceEnd = False
+    currentNGram = None;
+    ngram = ''
+
+    # Find an ngram which begins with a <start> tag
+    for ngram, tokenDict in ngramDict.items():
+        ngramWordList = ngram.split()
+        # print "randomNumber is = " + str(randomNumber)
+
+        if ngramWordList[0] == '<start>':
+            # print ("found starting ngram: " + ngram)
+            currentNGram = ngram
+            break
+
+
+    sentenceString += ngram
+    # print ("sentence now: ") + sentenceString;
+
+    randomNumber = random()
+    while sentenceEnd is False:
+        # print "fetching tokenDict"
+        tokenDict = ngramDict[ngram]
+        sumOfProbabilities = 0
+        for followingToken, tokenProbability in tokenDict.items():
+            if followingToken is not '<frequency>':
+                # print "followingToken is " + followingToken
+                sumOfProbabilities += Decimal(tokenProbability)
+                if sumOfProbabilities > randomNumber:
+                    previousWord = followingToken
+                    # print "previousWord is " + previousWord
+
+        if previousWord == None:
+            # print "previous word doesn't exist, setting chosenToken to " + followingToken
+            chosenToken = followingToken
+        else:
+            chosenToken = previousWord
+
+        sentenceString += " " + chosenToken
+        # add new token to ngramWordList and remove the first one to develop new ngram
+        ngramWordList.append(chosenToken)
+        del ngramWordList[0]
+
+        ngram = ' '.join(ngramWordList)
+        # print "new ngram is " + ngram
+
+        if chosenToken == '<end>':
+            sentenceEnd = True
+
+        # print "sentenceString now " + sentenceString
 
 
 
-
-    # Use the zip function to help us generate n-grams
-    # Concatentate the tokens into ngrams and return
-    # ngrams = zip(*[tokens[i:] for i in range(n)])
-    # return [" ".join(ngram) for ngram in ngrams]
-
-    return ngramDict
-
-    #Build the dictionary with tokens as keys and frequency as values
-
-
-# contents = "Natural-language processing (NLP) is an area of computer science " \
-#     "and artificial intelligence concerned with the interactions " \
-#     "between computers and human (natural) languages."
+    return sentenceString
 
 # contents = "my, oh my, i wish i had 100 dollars." \
 
-print (generate_ngrams(contents, n=10))
+for i in range(0, 10):
+    print (generate_ngrams(contents, n=4))
