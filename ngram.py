@@ -12,21 +12,29 @@ def main():
     # contents = f.read()
     # f.close()
 
-    for arg in sys.argv[3:]:
-        f = open(sys.argv[3:],"r")
+    n = None
+
+
+    for arg in sys.argv[1:]:
+        n = sys.argv[1]
+        numberOfSentences = sys.argv[2]
+        f = open(sys.argv[3],"r")
         contents = f.read()
         f.close()
 
-    generate_ngrams(contents, ngramDict)
-    generate_probabilities(ngramDict)
-    generate_sentences(ngramDict)
+    for i in range(int(numberOfSentences)):
+        generate_ngrams(contents, n, ngramDict)
+        generate_probabilities(ngramDict)
+        index = i + 1
+        print ("Sentence number #" + str(index) + ": ")
+        print (generate_sentences(ngramDict))
 
     # print (generate_sentences(ngramDict))
 
 
     # counts = dict()
 
-def generate_ngrams(s, ngramDict):
+def generate_ngrams(s, n, ngramDict):
     # Convert to lowercases
     s = s.lower()
 
@@ -47,7 +55,7 @@ def generate_ngrams(s, ngramDict):
 
     ngramCount = 0
     count = 0
-    ngramSize = 3
+    ngramSize = int(n)
     previousNgramDict = None
     lookBackBuffer = []
     ngramBuffer = [] * ngramSize
@@ -190,12 +198,12 @@ def generate_sentences(ngramDict):
 
 
     sentenceString += ngram
-    print ("sentence now: ") + sentenceString;
+    # print ("sentence now: ") + sentenceString;
 
     randomNumber = random()
-    print "random number is: " + str(randomNumber)
+    # print "random number is: " + str(randomNumber)
     while sentenceEnd is False:
-        print "fetching tokenDict for ngram: " + ngram
+        # print "fetching tokenDict for ngram: " + ngram
         tokenDict = ngramDict[ngram]
 
         # selecting amongst this ngrams's follow on words
@@ -204,35 +212,35 @@ def generate_sentences(ngramDict):
 
         for followingToken, tokenProbability in tokenDict.items():
             if followingToken is not '<frequency>':
-                print "followingToken is: " + followingToken
+                # print "followingToken is: " + followingToken
                 sumOfProbabilities += Decimal(tokenProbability)
 
-                print "sum of probabilities now " + str(sumOfProbabilities)
+                # print "sum of probabilities now " + str(sumOfProbabilities)
 
                 if sumOfProbabilities < randomNumber:
                     # selection not yet reached
-                    print "setting previousWord to: " + followingToken
+                    # print "setting previousWord to: " + followingToken
                     previousWord = followingToken
                 else:
                     # selection should be the previously token unless there isn't one
                     if previousWord is None:
-                        print "there was no previous word, choosing token: " + followingToken
+                        # print "there was no previous word, choosing token: " + followingToken
                         chosenToken = followingToken
                         break
                     else:
-                        print "setting chosen token to previous word: " + previousWord
+                        # print "setting chosen token to previous word: " + previousWord
                         chosenToken = previousWord
 
         if chosenToken is None:
             # didn't choose one
-            print "did not choose one, previous word was " + previousWord + " and token Dict is " + str(tokenDict)
+            # print "did not choose one, previous word was " + previousWord + " and token Dict is " + str(tokenDict)
             raise("internal error")
 
         if chosenToken is '<frequency>':
-            print "chosen token can never be frequency"
+            # print "chosen token can never be frequency"
             raise("internal error")
 
-        print "out of iterating through tokenDict items, chosenToken is " + chosenToken
+        # print "out of iterating through tokenDict items, chosenToken is " + chosenToken
 
         # if previousWord == None:
         #     if followingToken is not '<frequency>':
@@ -250,11 +258,11 @@ def generate_sentences(ngramDict):
             del ngramWordList[0]
 
             ngram = ' '.join(ngramWordList)
-            print "new ngram is " + ngram
+            # print "new ngram is " + ngram
         else:
             sentenceEnd = True
 
-        print sentenceString
+        # print sentenceString
 
     return sentenceString
 
