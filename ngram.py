@@ -180,8 +180,6 @@ def generate_probabilities(ngramDict):
 
 def generate_sentences(ngramDict):
     sentenceString =''
-    sumOfProbabilities = 0
-    chosenToken = None
     sentenceEnd = False
     currentNGram = None;
     ngram = ''
@@ -197,50 +195,64 @@ def generate_sentences(ngramDict):
             break
 
 
-    sentenceString += ngram
-    # print ("sentence now: ") + sentenceString;
+    sentenceString += ngramWordList[1]
+
+    print ("sentence now: ") + sentenceString;
 
     randomNumber = random()
-    # print "random number is: " + str(randomNumber)
+    print "random number is: " + str(randomNumber)
     while sentenceEnd is False:
-        # print "fetching tokenDict for ngram: " + ngram
+        print "fetching tokenDict for ngram: " + ngram
         tokenDict = ngramDict[ngram]
+        print "tokenDict is: " + str(tokenDict)
 
         # selecting amongst this ngrams's follow on words
         sumOfProbabilities = 0
         previousWord = None
+        chosenToken = None
 
-        for followingToken, tokenProbability in tokenDict.items():
-            if followingToken is not '<frequency>':
-                # print "followingToken is: " + followingToken
+        tokenKeys = tokenDict.keys()
+        tokenCount = len(tokenKeys)
+        tokenIndex = 0
+
+        while chosenToken is None:
+            if tokenIndex == tokenCount:
+                raise("tokenIndex exceeded range error")
+
+            followingToken = tokenKeys[tokenIndex]
+
+            if followingToken != '<frequency>':
+                tokenProbability = tokenDict[followingToken]
+                print "followingToken is: " + followingToken + " probability is : " + str(tokenProbability)
                 sumOfProbabilities += Decimal(tokenProbability)
 
-                # print "sum of probabilities now " + str(sumOfProbabilities)
+                print "sum of probabilities now " + str(sumOfProbabilities)
 
                 if sumOfProbabilities < randomNumber:
                     # selection not yet reached
-                    # print "setting previousWord to: " + followingToken
+                    print "setting previousWord to: " + followingToken
                     previousWord = followingToken
                 else:
                     # selection should be the previously token unless there isn't one
                     if previousWord is None:
-                        # print "there was no previous word, choosing token: " + followingToken
+                        print "there was no previous word, choosing token: " + followingToken
                         chosenToken = followingToken
                         break
                     else:
-                        # print "setting chosen token to previous word: " + previousWord
+                        print "setting chosen token to previous word: " + previousWord
                         chosenToken = previousWord
+            tokenIndex += 1
 
         if chosenToken is None:
             # didn't choose one
-            # print "did not choose one, previous word was " + previousWord + " and token Dict is " + str(tokenDict)
+            print "did not choose one, previous word was " + previousWord + " and token Dict is " + str(tokenDict)
             raise("internal error")
 
         if chosenToken is '<frequency>':
-            # print "chosen token can never be frequency"
+            print "chosen token can never be frequency"
             raise("internal error")
 
-        # print "out of iterating through tokenDict items, chosenToken is " + chosenToken
+        print "out of iterating through tokenDict items, chosenToken is " + chosenToken
 
         # if previousWord == None:
         #     if followingToken is not '<frequency>':
@@ -258,11 +270,11 @@ def generate_sentences(ngramDict):
             del ngramWordList[0]
 
             ngram = ' '.join(ngramWordList)
-            # print "new ngram is " + ngram
+            print "new ngram is " + ngram
         else:
             sentenceEnd = True
 
-        # print sentenceString
+        print "sentence currently: " + sentenceString
 
     return sentenceString
 
