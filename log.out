@@ -1,0 +1,29 @@
+Script started on Tue Feb 19 09:21:42 2019
+[?1034hbash-3.2$ python ngram.py 3 10 theMenofBoru.Jack.A.Nelson.txt theOsbornes.E.F.Benson.txt blackIvory.R.M.Ballantyne.txt
+This program generates random sentences based on an Ngram model.
+Created by Brandon Chin
+Command line settings: ngram.py n = 3 m = 10
+Sentence number #1: 
+bradley has another map.
+Sentence number #2: 
+harold agreed with you about things of far greater import , had got some nice thick pieces of raw flesh , so plausible through its naturalness , that he's in the slavemarket of zanzibar.
+Sentence number #3: 
+white ivory do come from the source of american power and the rich tropical foliage of that distressing species.
+Sentence number #4: 
+'twere better to enjoy a picture , i don't mind if i am over things like that.
+Sentence number #5: 
+today she could see that , whenever he had acted on no secret and mysterious tips from the bush and poured a small antelope , which soon reduced them to go through.
+Sentence number #6: 
+down in a style that has been out : savages have no money , and campequipage into bundles of a carter's horse , and mopped his streaming forehead with a band of manganja men and the awful cruelties that goes the pace of thatlor’ , my dear sir , don't be a woman short at dinner and giving a little to doan' sole hisself to him had come down , ” claude turned to harold and his flesh was deeply lacerated by the slavers.
+Sentence number #7: 
+d'ye think it right to a thing in a day on the chiefnot very heavily , and reptiles , all that in this one defeat to get in return is this consistent.
+Sentence number #8: 
+providence , however , turned the corrugated building into a coil which hung down their backs and limbs.
+Sentence number #9: 
+contrast them with an appetite that was biondinetti all over , ” it required no gifts of perception whatever to their satisfaction , as they pleased.
+Sentence number #10: 
+“but claude , and wherever you put on.
+bash-3.2$ exit
+exit
+
+Script done on Tue Feb 19 09:21:51 2019
