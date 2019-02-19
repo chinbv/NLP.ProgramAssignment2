@@ -140,23 +140,29 @@ def generate_ngrams(s,n):
     for x in tokens:
         count+=1
         # print 'Token Count = ' + str(count)
-    # print 'Token Count = ' + str(count)
+
+    #print 'Token Count = ' + str(count)
 
 
+    #print "-------------\ncalculating probabilities"
     for ngram, tokenDict in ngramDict.items():
         denominator = Decimal(tokenDict['<frequency>'])
-        # print 'denominator is ' + str(denominator)
+        #print 'denominator is ' + str(denominator)
         for followingToken, tokenCount in tokenDict.items():
             if followingToken is not '<frequency>':
-                # print 'tokenCount is ' + str(tokenCount)
+                #print 'tokenCount is ' + str(tokenCount)
                 probability = Decimal(tokenCount/denominator)
-                # print 'probability is = ' + str(probability)
+                #print 'probability is = ' + str(probability)
                 tokenDict[followingToken] = probability
-                # print str(tokenDict[followingToken])
+                #print str(tokenDict[followingToken])
+        #print "generated probabilities for ngram " + ngram + " token dict is " + str(tokenDict)
+
+
+
+    # generate sentences
 
     sentenceString =''
     sumOfProbabilities = 0
-    previousWord = None
     chosenToken = None
     sentenceEnd = False
     currentNGram = None;
@@ -177,34 +183,60 @@ def generate_ngrams(s,n):
     # print ("sentence now: ") + sentenceString;
 
     randomNumber = random()
+    #print "random number is " + str(randomNumber)
     while sentenceEnd is False:
-        # print "fetching tokenDict"
+        #print "fetching tokenDict for ngram " + ngram
         tokenDict = ngramDict[ngram]
+
+        # selecting amongst this ngrams's follow on words
         sumOfProbabilities = 0
+        previousWord = None
+
         for followingToken, tokenProbability in tokenDict.items():
             if followingToken is not '<frequency>':
-                # print "followingToken is " + followingToken
+                #print "followingToken is " + followingToken
                 sumOfProbabilities += Decimal(tokenProbability)
-                if sumOfProbabilities > randomNumber:
+
+                if sumOfProbabilities < randomNumber:
+                    # selection not yet reached
+                    #print "setting previousWord to " + followingToken
                     previousWord = followingToken
-                    # print "previousWord is " + previousWord
+                else:
+                    # selection should be the previously token unless there isn't one
+                    if previousWord is None:
+                        #print "there was no previous word, so using the the current one " + followingToken
+                        chosenToken = followingToken
+                    else:
+                        #print "setting chosen token to previous word " + previousWord
+                        chosenToken = previousWord
 
-        if previousWord == None:
-            # print "previous word doesn't exist, setting chosenToken to " + followingToken
-            chosenToken = followingToken
-        else:
-            chosenToken = previousWord
+        if chosenToken is None:
+            # didn't choose one
+            print "did not choose one, previous word was " + previousWord + " and token Dict is " + str(tokenDict)
+            raise("internal error")
 
-        sentenceString += " " + chosenToken
-        # add new token to ngramWordList and remove the first one to develop new ngram
-        ngramWordList.append(chosenToken)
-        del ngramWordList[0]
+        #print "out of iterating through tokenDict items, chosenToken is " + chosenToken
 
-        ngram = ' '.join(ngramWordList)
+        # if previousWord == None:
+        #     if followingToken is not '<frequency>':
+        #         print "previous word doesn't exist, setting chosenToken to " + followingToken
+        #         chosenToken = followingToken
+        #     else:
+        #         print "only found <frequency>, something wrong, look at this tokenDict:\n" + str(tokenDict)
+        # else:
+        #     chosenToken = previousWord
+
+        if chosenToken != '<end>':
+            sentenceString += " " + chosenToken
+            # add new token to ngramWordList and remove the first one to develop new ngram
+            ngramWordList.append(chosenToken)
+            del ngramWordList[0]
+
+            ngram = ' '.join(ngramWordList)
         # print "new ngram is " + ngram
-
-        if chosenToken == '<end>':
+        else:
             sentenceEnd = True
+
 
         # print "sentenceString now " + sentenceString
 
@@ -214,5 +246,6 @@ def generate_ngrams(s,n):
 
 # contents = "my, oh my, i wish i had 100 dollars." \
 
-for i in range(0, 10):
-    print (generate_ngrams(contents, n=4))
+#for i in range(0, 10):
+
+print (generate_ngrams(contents, n=4))
